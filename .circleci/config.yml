@@ -82,11 +82,10 @@ jobs:
           command: |
             cd frontend
             npm install
+            npm update kind-of --depth 11
             npm init -y
             npm audit fix --audit-level=critical --force
             npm audit fix --force
-            npm audit --audit-level=critical
-            npm update kind-of --depth 11
             npm audit --audit-level=critical
 
   scan-backend:
