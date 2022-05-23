@@ -86,6 +86,8 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
+            npm update kind-of --depth 11
+            npm audit --audit-level=critical
 
   scan-backend:
     docker:
@@ -108,7 +110,7 @@ workflows:
   say-hello-workflow:
     jobs:
       - build-frontend
-      - build-backend
+  #    - build-backend
       - test-frontend:
           requires: [build-frontend]
       - test-backend:
