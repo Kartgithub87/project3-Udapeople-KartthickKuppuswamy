@@ -225,7 +225,6 @@ jobs:
           name: Install tar,gzip,npm,awscli
           command: |
             apk add tar gzip
-            apk add npm
             apk update pip3
             pip3 install \
             awscli \ 
