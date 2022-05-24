@@ -228,7 +228,7 @@ jobs:
             apk add tar gzip
             apk update pip3
             pip3 install \
-            awscli \     
+            apk add --update --no-cache nodejs npm
       - run:
           name: Get backend url
           command: |
