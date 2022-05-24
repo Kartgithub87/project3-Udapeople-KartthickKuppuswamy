@@ -1,6 +1,20 @@
 
 version: 2.1
 
+commands:
+  destroy-environment:
+    description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
+  #  parameters:
+          # Add parameter here   
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+             aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
+             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
+             exit 1
+
 jobs:
   build-frontend:
   
@@ -110,7 +124,7 @@ jobs:
     steps:
       - checkout
       - run: yum install -y tar gzip
-  #    - run:
+  #   - run:
   #        name: Ensure back-end infrastructure exists
   #        command: |
   #          aws cloudformation deploy \
@@ -119,25 +133,58 @@ jobs:
   #            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
   #            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/frontend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"                
+  #    - run:
+  #       name: Ensure front-end infrastructure exist
+  #        command: |
+  #          aws cloudformation deploy \
+  #            --template-file .circleci/files/frontend.yml \
+  #            --tags project=udapeople \
+  #            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+  #            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"         
+
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo "[all]" > inventory.txt
+            echo "[web]" > inventory.txt
             aws ec2 describe-instances \
               --filters 'Name=tag:Name,Values=backend-*' \
               --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
+      
       - persist_to_workspace:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt       
+  
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - run:
+          name: Install tar, gzip and awscli
+          command: |
+            apk add openssh-client
+            apk add tar gzip
+            apk update pip3
+            pip3 install 
+            awscli 
+      - attach_workspace:
+          at:  ~/ 
+      - run: cat ~/project/.circleci/ansible/inventory.txt
+
+      - add_ssh_keys:
+          fingerprints: ["11:9d:2f:35:98:61:90:ec:05:0b:81:8e:b0:56:5b:ba"]
+      - run:
+          name: Install dependencies
+          command: |
+            # install the dependencies needed for your playbook
+            apk add --update ansible 
+      - run:
+          name: Configure server
+          command: |
+            ansible-playbook -vvvv -i ~/project/.circleci/ansible/inventory.txt  -c ssh configure-server.yml
+
+            
 
 workflows:
   say-hello-workflow:
@@ -152,4 +199,4 @@ workflows:
   #        requires: [build-frontend]
   #    - scan-backend:
   #        requires: [build-backend]     
-      - deploy-infrastructure 
+  #    - deploy-infrastructure 
