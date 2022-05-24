@@ -221,13 +221,10 @@ jobs:
       - image:  cimg/node:18.2.0
     steps:
       - checkout
-  #    - run:
-  #        name: Install tar,gzip,npm,awscli
-  #        command: |
-  #         apk add tar gzip
-  #          apk update pip3
-  #          pip3 install \
-  #         awscli \ 
+      - run:
+          name: Install tar,gzip,awscli
+          command: |
+            awscli \ 
       - run:
           name: Get backend url
           command: |
