@@ -165,8 +165,6 @@ jobs:
           command: |
             apk add openssh-client
             apk add tar gzip
-            apk update pip3
-            pip3 install 
             awscli 
       - attach_workspace:
           at:  ~/ 
