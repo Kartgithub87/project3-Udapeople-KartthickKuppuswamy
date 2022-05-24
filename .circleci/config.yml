@@ -215,17 +215,20 @@ jobs:
             then
              curl https://kvdb.io/S8hac9Q9FFGXxFTk9dqAM6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi                   
-  
+
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
-      - run: 
-          name: Install dependencies
+      - run:
+          name: Install tar, gzip and awscli
           command: |
-            yum install -y tar gzip
-            yum install npm
+            apk add openssh-client
+            apk add tar gzip
+            apk update pip3
+            pip3 install \
+            awscli \     
       - run:
           name: Get backend url
           command: |
@@ -236,7 +239,6 @@ jobs:
             echo "API_URL = ${API_URL}"
             echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
-
       - run:
           name: Deploy frontend objects
           command: |
