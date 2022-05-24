@@ -276,8 +276,7 @@ jobs:
             pip3 install awscli
             
       - attach_workspace:
-          at:  ~/ 
-      - run: cat ~/project/.circleci/ansible/inventory.txt
+          at:  ~/
 
       - add_ssh_keys:
           fingerprints: ["11:9d:2f:35:98:61:90:ec:05:0b:81:8e:b0:56:5b:ba"]
@@ -299,7 +298,8 @@ jobs:
             npm audit --audit-level=critical
             cd ..
             tar -C backend -czvf artifact.tar.gz .
-    #        cd .circleci/ansible
+            cd .circleci/ansible
+            cat inventory.txt
     #        ansible-playbook -i ~/inventory.txt deploy-backend.yml
 
 workflows:
