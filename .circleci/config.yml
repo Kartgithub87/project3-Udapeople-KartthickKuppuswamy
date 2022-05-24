@@ -288,19 +288,9 @@ jobs:
       - run:
           name: Deploy backend objects
           command: |
-            cd backend
-            npm i
-            npm init -y
-            npm run build
-            npm run test
-            npm audit fix --audit-level=critical --force
-            npm audit fix --force
-            npm audit --audit-level=critical
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
-            cat ~/inventory.txt
-    #        ansible-playbook -i ~/inventory.txt deploy-backend.yml
+            cat ~/project/.circleci/ansible/inventory.txt
+#           ansible-playbook -i ~/inventory.txt deploy-backend.yml
 
 workflows:
   say-hello-workflow:
