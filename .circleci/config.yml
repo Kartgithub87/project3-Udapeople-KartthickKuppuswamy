@@ -145,10 +145,10 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo "[web]" > inventory.txt
+            echo "[web]" > ~/inventory.txt
             aws ec2 describe-instances \
               --filters 'Name=tag:Name,Values=backend-*' \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> inventory.txt
+              --query 'Reservations[*].Instances[*].PublicIpAddress' --output text >> ~/inventory.txt
       
       - persist_to_workspace:
           root: ~/
@@ -218,16 +218,16 @@ jobs:
   
   deploy-frontend:
     docker:
-      - image: cimg/node:18.2.0
-      - image: amazon/aws-cli
-
+      - image: python:3.7-alpine3.11
     steps:
       - checkout
       - run:
-          name: Install dependencies
+          name: Install tar,gzip,npm,awscli
           command: |
-            apk add tar gzip
-            
+            apk add tar gzip npm
+            apk update pip3
+            pip3 install \
+            awscli \ 
       - run:
           name: Get backend url
           command: |
