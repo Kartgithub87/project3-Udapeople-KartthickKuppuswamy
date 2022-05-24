@@ -183,7 +183,7 @@ jobs:
           name: Configure server
           command: | 
             cd ~/project/.circleci/ansible
-            ansible-playbook -vvvv -i ~/inventory.txt  -c ssh configure-server.yml          
+            ansible-playbook -vvvv -i ~/inventory.txt  configure-server.yml          
 
 workflows:
   say-hello-workflow:
