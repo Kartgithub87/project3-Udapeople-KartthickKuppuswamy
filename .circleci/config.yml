@@ -231,4 +231,4 @@ workflows:
   #     - deploy-infrastructure
   #     - configure-infrastructure:
   #          requires: [deploy-infrastructure]
-      - run_migrations     
+      - run-migrations     
