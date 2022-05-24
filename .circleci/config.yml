@@ -154,10 +154,7 @@ jobs:
           root: ~/
           paths:
             - inventory.txt
-
-      - attach_workspace:
-          at:  ~/ 
-      - run: cat ~/inventory.txt             
+          
   
   configure-infrastructure:
     docker:
@@ -185,7 +182,7 @@ jobs:
       - run:
           name: Configure server
           command: |
-            ansible-playbook -vvvv -i ~/project/.circleci/ansible/inventory.txt  -c ssh configure-server.yml
+            ansible-playbook -vvvv -i ~/inventory.txt  -c ssh ~/project/.circleci/ansible/configure-server.yml
 
             
 
