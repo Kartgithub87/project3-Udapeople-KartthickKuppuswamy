@@ -147,12 +147,10 @@ jobs:
           command: |
             cd .circleci/ansible
             echo "[web]" > inventory.txt
-            export Dep_Infra=$(aws ec2 describe-instances \
-                               --filters 'Name=tag:Name,Values=backend-*' \
-                               --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-            echo ${Dep_Infra} 
-            echo ${Dep_Infra} >> inventory.txt
-            cat inventory.txt
+            export BACKEND_IP=$(aws ec2 describe-instances \
+                                --filters 'Name=tag:Name,Values=backend-*' \
+                                --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+            echo "API_URL = ${BACKEND_IP}"
       - persist_to_workspace:
           root: ~/
           paths:
