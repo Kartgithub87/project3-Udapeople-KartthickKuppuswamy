@@ -253,6 +253,45 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive  
          
+  deploy-backend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - run:
+          name: Install tar, gzip and awscli
+          command: |
+            apk add openssh-client
+            apk add tar gzip
+            apk add --update --no-cache nodejs npm
+            apk update pip3
+            pip3 install awscli
+            
+      - attach_workspace:
+          at:  ~/ 
+      - run: cat ~/inventory.txt
+      - add_ssh_keys:
+          fingerprints: ["11:9d:2f:35:98:61:90:ec:05:0b:81:8e:b0:56:5b:ba"]
+      - run:
+          name: Install dependencies
+          command: |
+            # install the dependencies needed for your playbook
+            apk add --update ansible 		
+      - run:
+          name: Deploy backend objects
+          command: |
+            cd backend
+            npm i
+            npm init -y
+            npm run build
+            npm run test
+            npm audit fix --audit-level=critical --force
+            npm audit fix --force
+            npm audit --audit-level=critical
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+    #        cd .circleci/ansible
+    #        ansible-playbook -i ~/inventory.txt deploy-backend.yml
 
 workflows:
   say-hello-workflow:
@@ -273,9 +312,10 @@ workflows:
 #              branches:
 #                only: [circleci-project-setup]
       - deploy-infrastructure
-      - configure-infrastructure:
-            requires: [deploy-infrastructure]
+#      - configure-infrastructure:
+#            requires: [deploy-infrastructure]
 #      - run-migrations:
 #            requires: [deploy-infrastructure]     
 #      - deploy-frontend:
 #            requires: [run-migrations]  
+      - deploy-backend
