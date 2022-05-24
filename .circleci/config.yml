@@ -226,9 +226,10 @@ jobs:
           command: |
             apk add openssh-client
             apk add tar gzip
-            apk update pip3
-            pip3 install \
             apk add --update --no-cache nodejs npm
+            apk update pip3
+            pip3 install awscli
+            
       - run:
           name: Get backend url
           command: |
