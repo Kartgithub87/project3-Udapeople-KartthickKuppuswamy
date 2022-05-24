@@ -200,12 +200,12 @@ jobs:
             npm run migrations > migrations_dump.txt
 
       - persist_to_workspace:
-          root: ~/project/backend
+          root: ~/
           paths:
-            - migrations_dump.txt 
+            - project/backend/migrations_dump.txt
 
       - attach_workspace:
-          at:  ~/project/backend/migrations_dump.txt 
+          at:  ~/
 
       - run:
           name: Send migration status to kvdb.io
