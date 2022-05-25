@@ -320,7 +320,7 @@ jobs:
           command: |
             apk add --update curl
             apk add --no-cache bash
-            apl install awscli
+            apk install export
       - attach_workspace:
           at: ~/
       - run: cat ~/project/.circleci/ansible/inventory.txt          
