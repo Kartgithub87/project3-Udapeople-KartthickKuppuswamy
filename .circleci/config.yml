@@ -154,13 +154,13 @@ jobs:
             echo ${BACKEND_SERVER_IP} >> inventory.txt
             cat inventory.txt
       - persist_to_workspace:
-          root: ~/
+          root: dist
           paths:
-            - project/.circleci/ansible/inventory.txt
+            - inventory.txt
 
       - attach_workspace:
-          at:  ~/
-      - run: cat ~/project/.circleci/ansible/inventory.txt
+          at:  dist
+      - run: cat dist/inventory.txt
       
           
   
@@ -330,8 +330,8 @@ workflows:
 #              branches:
 #                only: [circleci-project-setup]
       - deploy-infrastructure
-      - configure-infrastructure:
-            requires: [deploy-infrastructure]
+#      - configure-infrastructure:
+#            requires: [deploy-infrastructure]
 #      - run-migrations:
 #            requires: [deploy-infrastructure]     
 #      - deploy-frontend:
