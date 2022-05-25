@@ -320,16 +320,12 @@ jobs:
           command: |
             apk add --update curl
             apk update pip3
-            pip3 install awscli
-            
-      - attach_workspace:
-          at: ~/
-      - run: cat ~/project/.circleci/ansible/inventory.txt          
+            pip3 install awscli     
 
       - run:
           name: Get backend url
           command: |
-            export BACKEND_IP = $(aws ec2 describe-instances \
+            export BACKEND_IP=$(aws ec2 describe-instances \
                                 --filters 'Name=tag:Name,Values=backend-*' \
                                 --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)           
       - run:
