@@ -320,18 +320,17 @@ jobs:
           command: |
             apk add --update curl
             apk add --no-cache bash
-            apk install export
       - attach_workspace:
           at: ~/
       - run: cat ~/project/.circleci/ansible/inventory.txt          
       - run:
           name: Get backend url
           command: |
-            /bin/bash export BACKEND_IP = $(cat ~/project/.circleci/ansible/inventory.txt | grep -v [web])           
+            BACKEND_IP = $(cat ~/project/.circleci/ansible/inventory.txt | grep -v [web])           
       - run:
           name: Backend smoke test
           command: |
-            /bin/bash export API_URL="http://${BACKEND_IP}:3030"
+            API_URL="http://${BACKEND_IP}:3030"
             echo "${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
