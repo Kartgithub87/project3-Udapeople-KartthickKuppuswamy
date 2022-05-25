@@ -7,13 +7,6 @@ version: 2.1
 
 commands:
 
-  print_pipeline_id:
-    parameters:
-      id: 
-        type: string
-    steps:
-      - run: echo << parameters.id >>
-
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
@@ -38,7 +31,7 @@ commands:
           name: Revert Migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_<< parameters.workflow_id >>
+            SUCCESS=$(curl --insecure  https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_<< parameters.workflow_id >>)
             SUCCESS = 1
             if(( $SUCCESS==1 )); 
             then
