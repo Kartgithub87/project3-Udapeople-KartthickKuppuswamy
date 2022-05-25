@@ -329,12 +329,13 @@ workflows:
 #            filters:
 #              branches:
 #                only: [circleci-project-setup]
-      - deploy-infrastructure
-      - configure-infrastructure:
-            requires: [deploy-infrastructure]
+#      - deploy-infrastructure
+#      - configure-infrastructure:
+#            requires: [deploy-infrastructure]
 #      - run-migrations:
 #            requires: [deploy-infrastructure]     
 #      - deploy-frontend:
-#            requires: [run-migrations]  
+#            requires: [run-migrations]
+      - deploy-backend 
 #      - deploy-backend:
 #             requires: [run-migrations]
