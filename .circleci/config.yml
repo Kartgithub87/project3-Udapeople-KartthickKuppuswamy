@@ -124,14 +124,14 @@ jobs:
     steps:
       - checkout
       - run: yum install -y tar gzip
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --tags project=udapeople \
-              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+  #    - run:
+  #        name: Ensure back-end infrastructure exists
+  #        command: |
+  #          aws cloudformation deploy \
+  #           --template-file .circleci/files/backend.yml \
+  #            --tags project=udapeople \
+  #            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+  #            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
   #    - run:
   #        name: Ensure front-end infrastructure exist
@@ -285,19 +285,19 @@ jobs:
           command: |
             # install the dependencies needed for your playbook
             apk add --update ansible 		
-      - run:
-          name: Deploy backend objects
-          command: |
-            cd backend
-            npm i
-            npm init -y
-            npm run build
-            npm run test
-            npm audit fix --audit-level=critical --force
-            npm audit fix --force
-            npm audit --audit-level=critical
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
+  #    - run:
+  #        name: Deploy backend objects
+  #        command: |
+  #          cd backend
+  #          npm i
+  #          npm init -y
+  #          npm run build
+  #          npm run test
+  #          npm audit fix --audit-level=critical --force
+  #          npm audit fix --force
+  #          npm audit --audit-level=critical
+  #          cd ..
+  #          tar -C backend -czvf artifact.tar.gz .
   #    - persist_to_workspace:      
   #        root: dist
   #        paths:
@@ -329,7 +329,7 @@ workflows:
 #            filters:
 #              branches:
 #                only: [circleci-project-setup]
-#      - deploy-infrastructure
+      - deploy-infrastructure
 #      - configure-infrastructure:
 #            requires: [deploy-infrastructure]
 #      - run-migrations:
