@@ -320,6 +320,7 @@ jobs:
           command: |
             apk add --update curl
             apk add --no-cache bash
+            apk add --no-cache sh
       - attach_workspace:
           at: ~/
       - run: cat ~/project/.circleci/ansible/inventory.txt          
