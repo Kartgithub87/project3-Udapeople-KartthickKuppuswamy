@@ -178,7 +178,7 @@ jobs:
             pip3 install awscli
       - attach_workspace:
           at:  ~/ 
-      - run: cat ~/inventory.txt
+#      - run: cat ~/project/.circleci/ansible/inventory.txt
       - add_ssh_keys:
           fingerprints: ["11:9d:2f:35:98:61:90:ec:05:0b:81:8e:b0:56:5b:ba"]
       - run:
@@ -330,11 +330,11 @@ workflows:
 #              branches:
 #                only: [circleci-project-setup]
       - deploy-infrastructure
-#      - configure-infrastructure:
-#            requires: [deploy-infrastructure]
+      - configure-infrastructure:
+            requires: [deploy-infrastructure]
 #      - run-migrations:
 #            requires: [deploy-infrastructure]     
 #      - deploy-frontend:
 #            requires: [run-migrations]  
-      - deploy-backend:
-             requires: [deploy-infrastructure]
+#      - deploy-backend:
+#             requires: [run-migrations]
