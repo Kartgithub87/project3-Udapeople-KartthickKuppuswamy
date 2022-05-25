@@ -155,12 +155,12 @@ jobs:
             cat inventory.txt
 
       - persist_to_workspace:
-          root: ~/project/.circleci/ansible
+          root: ~/
           paths:
-            - inventory.txt
+            - ~/project/.circleci/ansible/inventory.txt
 
       - attach_workspace:
-          at: ~/project/.circleci/ansible
+          at: ~/
       - run: ~/project/.circleci/ansible/inventory.txt
       
           
