@@ -17,8 +17,7 @@ commands:
              aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
              aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7}
              aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
-             exit 1
-  
+              
   revert-migrations:
     parameters:
       workflow_id:
@@ -35,7 +34,8 @@ commands:
               cd ~/project/backend
               npm install
               npm run migration:revert
-            fi  	
+            exit 1
+            fi
 
 jobs:
   build-frontend:
@@ -146,23 +146,23 @@ jobs:
     steps:
       - checkout
       - run: yum install -y tar gzip
-  #    - run:
-  #        name: Ensure back-end infrastructure exists
-  #        command: |
-  #          aws cloudformation deploy \
-  #           --template-file .circleci/files/backend.yml \
-  #            --tags project=udapeople \
-  #            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+             --template-file .circleci/files/backend.yml \
+             --tags project=udapeople \
+             --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
-  #    - run:
-  #        name: Ensure front-end infrastructure exist
-  #        command: |
-  #          aws cloudformation deploy \
-  #           --template-file .circleci/files/frontend.yml \
-  #           --tags project=udapeople \
-  #            --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-  #            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"         
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+             --template-file .circleci/files/frontend.yml \
+             --tags project=udapeople \
+             --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"         
 
       - run:
           name: Add back-end ip to ansible inventory
@@ -184,6 +184,8 @@ jobs:
       - attach_workspace:
           at: ~/
       - run: cat ~/project/.circleci/ansible/inventory.txt
+      - destroy_environment
+      - revert_migrations
               
   
   configure-infrastructure:
@@ -212,7 +214,9 @@ jobs:
           name: Configure server
           command: | 
             cd ~/project/.circleci/ansible
-            ansible-playbook -vvvv -i ~/project/.circleci/ansible/inventory.txt  configure-server.yml  
+            ansible-playbook -vvvv -i ~/project/.circleci/ansible/inventory.txt  configure-server.yml 
+      - destroy_environment
+      - revert_migrations       
 
   run-migrations:
     docker:
@@ -243,7 +247,9 @@ jobs:
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
              curl https://kvdb.io/S8hac9Q9FFGXxFTk9dqAM6/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-            fi                   
+            fi   
+      - destroy_environment
+      - revert_migrations                      
 
   deploy-frontend:
     docker:
@@ -282,6 +288,8 @@ jobs:
             npm audit --audit-level=critical
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive  
+      - destroy-environment
+      - revert-migrations      
          
   deploy-backend:
     docker:
@@ -331,7 +339,9 @@ jobs:
             cd .circleci/ansible
             cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt deploy-backend.yml
-  
+      - destroy-environment
+      - revert-migrations
+
   smoke-test:
     docker:
      - image: python:3.7-alpine3.11
@@ -369,34 +379,36 @@ jobs:
             else
             return 1
             fi
+      - destroy-environment
+      - revert-migrations      
 
 workflows:
   say-hello-workflow:
     jobs:
-#      - build-frontend
-#      - build-backend
-#      - test-frontend:
-#          requires: [build-frontend]
-#      - test-backend:
-#         requires: [build-backend]   
-#      - scan-frontend:
-#          requires: [build-frontend]
-#      - scan-backend:
-#          requires: [build-backend]     
-#      - deploy-infrastructure:
-#            requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-#            filters:
-#              branches:
-#                only: [circleci-project-setup]
-#      - deploy-infrastructure
-#      - configure-infrastructure:
-#            requires: [deploy-infrastructure]
-#      - run-migrations:
-#            requires: [deploy-infrastructure]     
-#      - deploy-frontend:
-#            requires: [run-migrations]
-#      - deploy-backend: 
-#             requires: [deploy-infrastructure] 
-#      - deploy-backend:
-#             requires: [run-migrations]
-       - smoke-test  
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+         requires: [build-backend]   
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]     
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+          branches:
+            only: [circleci-project-setup]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]     
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend: 
+          requires: [run-migrations] 
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-frontend, deploy-backend]
