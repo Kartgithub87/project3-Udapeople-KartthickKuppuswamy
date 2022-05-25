@@ -306,6 +306,7 @@ jobs:
           path: ~/project/artifact.tar.gz
       - run:  
           name: invoke ansible script
+          command: |
             cd .circleci/ansible
             cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt deploy-backend.yml
