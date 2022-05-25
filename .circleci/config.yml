@@ -1,9 +1,9 @@
 
 version: 2.1
 
-orbs:
+#orbs:
 
-  aws-cli: circleci/aws-cli@2.0.3
+#  aws-cli: circleci/aws-cli@2.0.3
 
 commands:
   destroy-environment:
@@ -383,8 +383,8 @@ jobs:
             else
             return 1
             fi
-      - destroy-environment:
-      - revert-migrations:      
+      - destroy-environment
+      - revert-migrations     
 
 workflows:
   say-hello-workflow:
