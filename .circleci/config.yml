@@ -234,16 +234,17 @@ jobs:
             ls -lart
             npm install
             npm audit fix --audit-level=critical --force
-#            npm run migrations > migrations_dump.txt
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
 
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend/migrations_dump.txt
+  #    - persist_to_workspace:
+  #        root: ~/
+  #        paths:
+  #          - project/backend/migrations_dump.txt
 
-      - attach_workspace:
-          at: ~/
-      - run: cat ~/project/backend/migrations_dump.txt
+  #    - attach_workspace:
+  #        at: ~/
+  #    - run: cat ~/project/backend/migrations_dump.txt
 
       - run:
           name: Send migration status to kvdb.io
