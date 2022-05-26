@@ -230,6 +230,9 @@ jobs:
             sudo pip3 install awscli
             cd backend
             npm i
+            npm audit fix --audit-level=critical --force
+            npm audit fix --force
+            npm audit --audit-level=critical
             npm run migrations > migrations_dump.txt
 
       - persist_to_workspace:
