@@ -229,7 +229,7 @@ jobs:
             cd backend
             npm i
             npm run migrations > migrations_dump.txt
-
+  #         check migration
       - persist_to_workspace:
           root: ~/
           paths:
