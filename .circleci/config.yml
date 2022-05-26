@@ -221,8 +221,7 @@ jobs:
           name: install dependencies
           command: |
             sudo apt-get install -y python3-pip
-            sudo pip3 install awscli   
-            run migration  check        
+            sudo pip3 install awscli     
       - restore_cache:
           keys: [backend_buildtest]
       - run:
