@@ -415,7 +415,7 @@ jobs:
             echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"        
 
 workflows:
-  say-hello-workflow:
+  udapeopleflow:
     jobs:
       - build-frontend
       - build-backend
