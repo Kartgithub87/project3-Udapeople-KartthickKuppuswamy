@@ -221,11 +221,11 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-#      - run:
-#          name: install dependencies
-#          command: |
-#            sudo apt-get install -y python3-pip
-#            sudo pip3 install awscli     
+      - run:
+          name: install dependencies
+          command: |
+            sudo apt-get install -y python3-pip
+            sudo pip3 install awscli     
       - restore_cache:
           keys: [backend]
       - run:
@@ -451,26 +451,25 @@ jobs:
 workflows:
   udapeopleflow:
     jobs:
-  #    - build-frontend
-  #    - build-backend
-  #    - test-frontend:
-  #        requires: [build-frontend]
-  #    - test-backend:
-  #       requires: [build-backend]   
-  #    - scan-frontend:
-  #        requires: [build-frontend]
-  #    - scan-backend:
-  #        requires: [build-backend]     
-  #    - deploy-infrastructure:
-  #        requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-  #       filters:
-  #          branches:
-  #            only: main
-  #    - configure-infrastructure:
-  #        requires: [deploy-infrastructure]
-  #    - run-migrations:
-  #      requires: [configure-infrastructure]     
-      - run-migrations  
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+         requires: [build-backend]   
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]     
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: main
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - run-migrations:
+          requires: [configure-infrastructure]     
       - deploy-frontend:
           requires: [run-migrations]
       - deploy-backend:
