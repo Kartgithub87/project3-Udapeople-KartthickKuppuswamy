@@ -44,7 +44,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-buildtest]
       - run:
           name: "Build Front End"
           command: |
@@ -54,7 +54,7 @@ jobs:
             
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend_build           
+          key: frontend_buildtest           
 
 
   build-backend:
@@ -63,7 +63,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-buildtest]
       - run:
           name: "Build Back End"
           command: |
@@ -72,7 +72,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend_build      
+          key: backend_buildtest      
   
   test-frontend:
     docker:
@@ -80,7 +80,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend_build]
+          keys: [frontend_buildtest]
       - run: 
           name: Front End test
           command: |
@@ -94,7 +94,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend_build]
+          keys: [backend_buildtest]
       - run: 
           name: Back End test
           command: |
@@ -108,7 +108,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend_build]
+          keys: [frontend_buildtest]
       - run: 
           name: scanning front end
           command: |
@@ -122,7 +122,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend_build]
+          keys: [backend_buildtest]
       - run: 
           name: scanning backend end
           command: |
@@ -217,14 +217,14 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-#      - run:
-#          name: install dependencies
-#          command: |
-#            sudo apt-get install -y python3-pip
-#            sudo pip3 install awscli   
-#           run migration  check        
+      - run:
+          name: install dependencies
+          command: |
+            sudo apt-get install -y python3-pip
+            sudo pip3 install awscli   
+            run migration  check        
       - restore_cache:
-          keys: [backend_build]
+          keys: [backend_buildtest]
       - run:
           name: Run migrations
           command: |
@@ -449,16 +449,16 @@ jobs:
 workflows:
   udapeopleflow:
     jobs:
-#      - build-frontend
-#      - build-backend
-#      - test-frontend:
-#          requires: [build-frontend]
-#      - test-backend:
-#         requires: [build-backend]   
-#      - scan-frontend:
-#          requires: [build-frontend]
-#      - scan-backend:
-#          requires: [build-backend]     
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+         requires: [build-backend]   
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]     
 #      - deploy-infrastructure:
 #          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
 #          filters:
@@ -466,9 +466,9 @@ workflows:
 #              only: main
 #     - configure-infrastructure:
 #          requires: [deploy-infrastructure]
-      - run-migrations
-#      - run-migrations:
-#         requires: [configure-infrastructure]     
+#      - run-migrations
+      - run-migrations:
+         requires: [test-frontend, test-backend, scan-frontend, scan-backend]     
 #     - deploy-frontend:
 #         requires: [run-migrations]
 #     - deploy-backend:
