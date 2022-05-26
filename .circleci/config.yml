@@ -221,13 +221,13 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - run:
-          name: install dependencies
-          command: |
-            sudo apt-get install -y python3-pip
-            sudo pip3 install awscli     
-  #    - restore_cache:
-  #        keys: [backend]
+#      - run:
+#          name: install dependencies
+#          command: |
+#            sudo apt-get install -y python3-pip
+#            sudo pip3 install awscli     
+      - restore_cache:
+          keys: [backend]
       - run:
           name: Run migrations
           command: |
