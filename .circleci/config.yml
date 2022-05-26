@@ -222,7 +222,7 @@ jobs:
           command: |
             sudo apt-get install -y python3-pip
             sudo pip3 install awscli   
-#           run migration              
+#           run migration  check        
       - restore_cache:
           keys: [backend]
       - run:
