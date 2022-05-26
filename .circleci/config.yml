@@ -54,7 +54,7 @@ jobs:
             
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend           
+          key: frontend_build           
 
 
   build-backend:
@@ -72,7 +72,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend      
+          key: backend_build      
   
   test-frontend:
     docker:
@@ -80,7 +80,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend]
+          keys: [frontend_build]
       - run: 
           name: Front End test
           command: |
@@ -94,7 +94,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend]
+          keys: [backend_build]
       - run: 
           name: Back End test
           command: |
@@ -108,7 +108,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend]
+          keys: [frontend_build]
       - run: 
           name: scanning front end
           command: |
@@ -122,7 +122,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend]
+          keys: [backend_build]
       - run: 
           name: scanning backend end
           command: |
@@ -233,6 +233,7 @@ jobs:
             npm cache clean -f
             ls -lart
             npm install
+            npm run build
             npm audit fix --audit-level=critical --force
             npm run migrations > migrations_dump.txt
             cat migrations_dump.txt
@@ -453,16 +454,16 @@ jobs:
 workflows:
   udapeopleflow:
     jobs:
-#      - build-frontend
-#      - build-backend
-#      - test-frontend:
-#          requires: [build-frontend]
-#      - test-backend:
-#         requires: [build-backend]   
-#      - scan-frontend:
-#          requires: [build-frontend]
-#      - scan-backend:
-#          requires: [build-backend]     
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+         requires: [build-backend]   
+      - scan-frontend:
+          requires: [build-frontend]
+      - scan-backend:
+          requires: [build-backend]     
 #      - deploy-infrastructure:
 #          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
 #          filters:
@@ -470,7 +471,7 @@ workflows:
 #              only: main
 #     - configure-infrastructure:
 #          requires: [deploy-infrastructure]
-      - run-migrations
+#      - run-migrations
 #      - run-migrations:
 #         requires: [configure-infrastructure]     
 #     - deploy-frontend:
