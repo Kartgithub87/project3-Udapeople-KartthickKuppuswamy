@@ -16,7 +16,7 @@ commands:
             echo "Destroying environment: << parameters.workflow_id >>"
             aws s3 rm "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws cloudformation delete-stack --stack-name upapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
               
   revert-migrations:
     parameters:
@@ -35,7 +35,7 @@ commands:
               npm run migration:revert
             exit 1
             fi
-            echo "executed it as success is not 1"
+
 jobs:
   build-frontend:
   
@@ -49,9 +49,9 @@ jobs:
           name: "Build Front End"
           command: |
             cd frontend
-            npm install
-            npm init -y
+            npm i
             npm run build
+            
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend           
@@ -68,8 +68,7 @@ jobs:
           name: "Build Back End"
           command: |
             cd backend
-            npm install
-            npm init -y
+            npm i
             npm run build
       - save_cache:
           paths: [backend/node_modules]
@@ -86,8 +85,7 @@ jobs:
           name: Front End test
           command: |
             cd frontend
-            npm install
-            npm init -y
+            npm i
             npm run test
 
   test-backend:
@@ -101,8 +99,7 @@ jobs:
           name: Back End test
           command: |
             cd backend
-            npm install
-            npm init -y
+            npm i
             npm run test
 
   scan-frontend:
@@ -116,8 +113,7 @@ jobs:
           name: scanning front end
           command: |
             cd frontend
-            npm install
-            npm init -y
+            npm i
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
@@ -133,8 +129,7 @@ jobs:
           name: scanning backend end
           command: |
             cd backend
-            npm install
-            npm init -y
+            npm i
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
@@ -232,7 +227,7 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm install
+            npm i
             npm run migrations > migrations_dump.txt
 
       - persist_to_workspace:
@@ -285,8 +280,7 @@ jobs:
           name: Deploy frontend objects
           command: |
             cd frontend
-            npm install
-            npm init -y
+            npm i
             npm run build
             npm run test
             npm audit fix --audit-level=critical --force
@@ -330,7 +324,6 @@ jobs:
           command: |
             cd backend
             npm i
-            npm init -y
             npm run build
             npm run test
             npm audit fix --audit-level=critical --force
@@ -387,7 +380,7 @@ jobs:
             echo ${URL} 
             if curl  -s ${URL} | grep "Welcome"
             then
-            return 1
+            return 0
             else
             return 1
             fi
@@ -412,7 +405,43 @@ jobs:
              --parameter-overrides WorkflowID="mybucket-${CIRCLE_WORKFLOW_ID:0:7}" \
              --tags project=udapeople    
              
-            echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"        
+            echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"    
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
+
+
+  cleanup:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Get old stack workflow id
+          command: |
+            export OldWorkflowID=$(aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text)
+
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+
+            # fetch all stacks names   
+
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+            --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
+            
+            echo Stack names: "${STACKS[@]}"    
+            
+            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
+            then
+            aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
+            aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            else
+            return 1
+            fi        
+
 
 workflows:
   udapeopleflow:
@@ -431,7 +460,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [master]
+              only: main
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
@@ -443,4 +472,6 @@ workflows:
       - smoke-test:
          requires: [deploy-frontend, deploy-backend]
       - cloudfront-update:
-          requires: [smoke-test]         
+          requires: [smoke-test] 
+  #    - cleanup:
+  #        requries: [cloudfront-update]            
