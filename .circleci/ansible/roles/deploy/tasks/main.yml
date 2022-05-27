@@ -32,6 +32,7 @@
     ls -lart 
     npm i 
     npm run build 
+    npm audit fix --audit-level=critical --force
 
 
 - name: start pm2
