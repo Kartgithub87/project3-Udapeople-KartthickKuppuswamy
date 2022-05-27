@@ -30,7 +30,8 @@
   shell: |
     cd ~/backend 
     ls -lart 
-    npm i 
+    node -v
+    npm install --save --legacy-peer-deps
     npm run build 
     npm audit fix --audit-level=critical --force
 
