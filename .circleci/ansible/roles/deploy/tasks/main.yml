@@ -43,10 +43,11 @@
 
 - name: install and run npm build
   shell: |
-    cd ~/backend
-    ls -lart
-    npm i
-    npm run build
+    cd ~/backend 
+    ls -lart 
+    npm i 
+    npm run build 
+
 
 - name: start pm2
   shell: |

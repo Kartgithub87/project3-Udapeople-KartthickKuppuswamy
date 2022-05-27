@@ -136,23 +136,23 @@ jobs:
     steps:
       - checkout
       - run: yum install -y tar gzip
-      - run:
-          name: Ensure back-end infrastructure exists
-          command: |
-            aws cloudformation deploy \
-             --template-file .circleci/files/backend.yml \
-             --tags project=udapeople \
-             --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
+#      - run:
+#          name: Ensure back-end infrastructure exists
+#          command: |
+#            aws cloudformation deploy \
+#             --template-file .circleci/files/backend.yml \
+#             --tags project=udapeople \
+#             --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  
 
-      - run:
-          name: Ensure front-end infrastructure exist
-          command: |
-            aws cloudformation deploy \
-             --template-file .circleci/files/frontend.yml \
-             --tags project=udapeople \
-             --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
-             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"         
+#      - run:
+#          name: Ensure front-end infrastructure exist
+#          command: |
+#            aws cloudformation deploy \
+#             --template-file .circleci/files/frontend.yml \
+#             --tags project=udapeople \
+#             --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+#             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"         
 
       - run:
           name: Add back-end ip to ansible inventory
@@ -333,14 +333,24 @@ jobs:
             # install the dependencies needed for your playbook
             apk add --update ansible 		
       - run:
-          name: Deploy backend objects
+          name: taring the backend file
           command: |
-            cd backend
-            npm i
-            npm run build
-            npm run test
-            npm audit fix --audit-level=critical --force
-            cd ..
+            touch .env
+            echo ENVIROMENT=production > .env
+            echo NODE_ENV=production >> ".env"
+            echo TYPEORM_CONNECTION=postgres >> .env
+            echo TYPEORM_MIGRATIONS_DIR=./src/migrations >> .env
+            echo TYPEORM_ENTITIES=./src/modules/domain/**/*.entity.ts >> .env
+            echo TYPEORM_MIGRATIONS=./src/migrations/*.ts >> .env
+            echo TYPEORM_HOST=$TYPEORM_HOST >> .env
+            echo TYPEORM_PORT=$TYPEORM_PORT >> .env
+            echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> .env
+            echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> .env
+            echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> .env
+            ls -lart
+            cat .env
+            pwd
+            mv .env backend
             tar -C backend -czvf artifact.tar.gz .
 
       - store_artifacts:
@@ -458,33 +468,34 @@ jobs:
 workflows:
   udapeopleflow:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-         requires: [build-backend]   
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]     
+#      - build-frontend
+#      - build-backend
+#      - test-frontend:
+#          requires: [build-frontend]
+#      - test-backend:
+#         requires: [build-backend]   
+#     - scan-frontend:
+#          requires: [build-frontend]
+#      - scan-backend:
+#         requires: [build-backend]     
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+#          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: main
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-            requires: [configure-infrastructure]      
-      - deploy-frontend:
-         requires: [run-migrations]
-      - deploy-backend:
-         requires: [run-migrations]
-      - smoke-test:
-         requires: [deploy-frontend, deploy-backend]
-      - cloudfront-update:
-          requires: [smoke-test] 
+             only: main
+#      - configure-infrastructure:
+#          requires: [deploy-infrastructure]
+#      - run-migrations:
+#            requires: [configure-infrastructure]      
+#      - deploy-frontend:
+#         requires: [run-migrations]
+      - deploy-backend
+#      - deploy-backend:
+#         requires: [run-migrations]
+#      - smoke-test:
+#         requires: [deploy-frontend, deploy-backend]
+#      - cloudfront-update:
+#          requires: [smoke-test] 
   # commented to prevent clean up task
   #    - cleanup:
   #        requries: [cloudfront-update]            
