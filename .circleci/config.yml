@@ -27,7 +27,7 @@ commands:
           name: Revert Migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/3rrLc3ccN4VxaEAfN3xzCp/migration_<< parameters.workflow_id >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/ShAoBxWKdV6CRsJTRZoRpS/migration_<< parameters.workflow_id >>)
             if(( $SUCCESS==1 )); 
             then
               cd ~/project/backend
@@ -256,7 +256,8 @@ jobs:
           command: |   
             if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
             then
-             curl https://kvdb.io/3rrLc3ccN4VxaEAfN3xzCp/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+             echo "its successfully migrated - storing SUCCESS -> 1"
+             curl https://kvdb.io/ShAoBxWKdV6CRsJTRZoRpS/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi   
 #      - destroy-environment:
 #          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
@@ -379,7 +380,7 @@ jobs:
             then
             return 0
             else
-            return 0
+            return 1
             fi
       - run:
           name: Frontend smoke test.
@@ -454,25 +455,26 @@ jobs:
 workflows:
   udapeopleflow:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-         requires: [build-backend]   
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]     
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-          filters:
-            branches:
-              only: main
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-            requires: [configure-infrastructure]  
+#      - build-frontend
+#      - build-backend
+#      - test-frontend:
+#          requires: [build-frontend]
+#      - test-backend:
+#         requires: [build-backend]   
+#      - scan-frontend:
+#          requires: [build-frontend]
+#      - scan-backend:
+#          requires: [build-backend]     
+#      - deploy-infrastructure:
+#          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+#          filters:
+#            branches:
+#              only: main
+#      - configure-infrastructure:
+#          requires: [deploy-infrastructure]
+#      - run-migrations:
+#            requires: [configure-infrastructure]  
+      - run-migrations      
       - deploy-frontend:
          requires: [run-migrations]
       - deploy-backend:
