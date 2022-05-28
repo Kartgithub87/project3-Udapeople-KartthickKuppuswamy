@@ -176,8 +176,6 @@ jobs:
       - run: cat ~/project/.circleci/ansible/inventory.txt
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
               
   
   configure-infrastructure:
@@ -208,9 +206,7 @@ jobs:
             cd ~/project/.circleci/ansible
             ansible-playbook -vvvv -i ~/project/.circleci/ansible/inventory.txt  configure-server.yml 
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}      
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}    
 
   run-migrations:
     docker:
@@ -242,11 +238,11 @@ jobs:
              curl -k https://kvdb.io/QubgRKrupxwzT2t6DYgejS/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
             fi   
             echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"
+            
       - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}     
       - revert-migrations:
-         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}       
-  
+         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
 
   deploy-frontend:
     docker:
@@ -280,12 +276,12 @@ jobs:
             tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"  
+      
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-    
-         
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
+
   deploy-backend:
     docker:
       - image: python:3.7-alpine3.11
@@ -300,7 +296,9 @@ jobs:
           command: |
             # install the dependencies needed for your playbook
             apk add --update openssh-client
-            apk add --update tar gzip ansible nodejs npm
+            apk add --update tar gzip ansible nodejs npm curl
+            apk update pip3
+            pip3 install awscli
       - run:
           name: taring the backend file
           command: |
@@ -319,6 +317,10 @@ jobs:
             ls -lart
             cat .env
             pwd
+            cd backend
+            npm i
+            npm run build
+            cd ..
             mv .env backend
             tar -C backend -czvf artifact.tar.gz .
 
@@ -332,10 +334,12 @@ jobs:
             cat ~/project/.circleci/ansible/inventory.txt
             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt deploy-backend.yml
             echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
+     
+     
+  #    - destroy-environment:
+  #        workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  #    - revert-migrations:
+  #        workflow_id: ${CIRCLE_WORKFLOW_ID:0:7} 
 
   smoke-test:
     docker:
@@ -375,10 +379,10 @@ jobs:
             return 1
             fi
             echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
-      - revert-migrations:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}     
+    #  - destroy-environment:
+    #      workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+    #  - revert-migrations:
+    #      workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}     
 
 
   cloudfront-update:
@@ -462,8 +466,8 @@ workflows:
          requires: [run-migrations]
       - smoke-test:
          requires: [deploy-frontend, deploy-backend]
-      - cloudfront-update:
-          requires: [smoke-test] 
+  #    - cloudfront-update:
+  #        requires: [smoke-test] 
   # commented to prevent clean up task
   #    - cleanup:
   #        requries: [cloudfront-update]            

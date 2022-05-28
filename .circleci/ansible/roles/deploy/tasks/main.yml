@@ -10,20 +10,16 @@
     src: ~/project/artifact.tar.gz
     dest: ~/backend
 
-- name: install and run npm build
+- name: install npm v13.8.0
+  become: true
   shell: |
-    cd ~/backend 
-    ls -lart 
     node -v
     npm install -g n
     n 13.8.0
-    hash -r
+    npm install -g pm2
     node --version
     npm -v
-    npm run build
 
 - name: start pm2
   shell: |
-    cd ~/backend
-    pm2 stop default
-    pm2 start npm --name backend -- start
+    /usr/bin/pm2 start /home/ubuntu/backend/dist/main.js --name backend -f
