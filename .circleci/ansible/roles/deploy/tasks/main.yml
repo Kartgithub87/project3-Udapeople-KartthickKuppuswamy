@@ -31,9 +31,14 @@
     cd /home/ubuntu/backend
     npm install -g n
     n 13.8.0
-    npm run build
     chown -R ubuntu:ubuntu /home/ubuntu/backend
 
+- name: build
+  shell: |
+    cd /home/ubuntu/backend
+    npm install
+    npm run build
+    
 - name: start pm2
   shell: |
     cd /home/ubuntu/backend    
