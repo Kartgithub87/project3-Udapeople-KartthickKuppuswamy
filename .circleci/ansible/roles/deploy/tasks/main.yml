@@ -1,4 +1,19 @@
 ---
+- name: Install Dependencies
+  become: true
+  apt:
+    name: ["nodejs", "npm"]
+    state: latest
+    update_cache: yes
+
+- name: Install pm2
+  become: true
+  npm:
+    name: pm2
+    global: yes
+    production: yes
+    state: present
+
 - name: Creates directory
   file:
     path: ~/backend
@@ -10,16 +25,16 @@
     src: ~/project/artifact.tar.gz
     dest: ~/backend
 
-- name: install npm v13.8.0
+- name: install npm & switch to 13.8.0 to build
   become: true
   shell: |
-    node -v
+    cd /home/ubuntu/backend
     npm install -g n
     n 13.8.0
-    npm install -g pm2
-    node --version
-    npm -v
+    npm run build
+    chown -R ubuntu:ubuntu /home/ubuntu/backend
 
 - name: start pm2
   shell: |
-    /usr/bin/pm2 start /home/ubuntu/backend/dist/main.js --name backend -f
+    cd /home/ubuntu/backend    
+    pm2 start npm --name backend -- start
