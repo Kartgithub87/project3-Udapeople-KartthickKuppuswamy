@@ -1,0 +1,9 @@
+URL01 - https://github.com/Kartgithub87/project3-Udapeople-KartthickKuppuswamy
+
+URL02 - http://udapeople-215ebdf.s3-website-us-east-1.amazonaws.com/#/employees
+
+URL03 - https://d2zoh1g3kjfl2x.cloudfront.net/#/employees
+
+URL04 - http://54.167.152.164:3030/api/status
+
+URL05 - http://ec2-54-167-152-164.compute-1.amazonaws.com:9090/targets
