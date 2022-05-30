@@ -392,7 +392,7 @@ jobs:
             aws cloudformation deploy \
              --template-file .circleci/files/cloudfront.yml \
              --stack-name InitialStack \
-             --parameter-overrides WorkflowID="mybucket-${CIRCLE_WORKFLOW_ID:0:7}" \
+             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
              --tags project=udapeople    
              
             echo Current WorkFlowID: "${CIRCLE_WORKFLOW_ID:0:7}"    
@@ -426,9 +426,12 @@ jobs:
             
             if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
             then
+            echo "=============delete confirmed======================="
+            aws s3 rm s3://udapeople-${OldWorkflowID} --recursive
             aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
             aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
             else
+            echo "==============cannot cleanup========================"
             return 1
             fi        
 
@@ -463,6 +466,5 @@ workflows:
          requires: [deploy-frontend, deploy-backend]
       - cloudfront-update:
           requires: [smoke-test] 
-  # commented to prevent clean up task
-  #    - cleanup:
-  #        requries: [cloudfront-update]            
+      - cleanup:
+          requries: [cloudfront-update]            
